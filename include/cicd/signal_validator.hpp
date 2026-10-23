@@ -2,11 +2,7 @@
 
 namespace cicd {
 
-enum class SignalStatus {
-    Valid,
-    OutOfRange,
-    RateExceeded
-};
+enum class SignalStatus { Valid, OutOfRange, RateExceeded };
 
 struct SignalLimits {
     double min_value;
@@ -21,11 +17,11 @@ class SignalValidator {
 public:
     /// @throws std::invalid_argument if min_value > max_value or
     ///         max_delta_per_sample is negative.
-    explicit SignalValidator(const SignalLimits& limits);
+    explicit SignalValidator(const SignalLimits &limits);
 
     SignalStatus check(double sample);
     void reset() noexcept;
-    const SignalLimits& limits() const noexcept;
+    const SignalLimits &limits() const noexcept;
 
 private:
     SignalLimits limits_;
@@ -33,6 +29,6 @@ private:
     double previous_{0.0};
 };
 
-const char* to_string(SignalStatus status) noexcept;
+const char *to_string(SignalStatus status) noexcept;
 
-}  // namespace cicd
+} // namespace cicd

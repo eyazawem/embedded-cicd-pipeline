@@ -24,26 +24,20 @@ double MovingAverage::value() const {
     if (count_ == 0U) {
         throw std::logic_error("no sample available");
     }
-    const double sum = std::accumulate(
-        buffer_.begin(), buffer_.begin() + static_cast<std::ptrdiff_t>(count_), 0.0);
+    const double sum = std::accumulate(buffer_.begin(),
+                                       buffer_.begin() + static_cast<std::ptrdiff_t>(count_), 0.0);
     return sum / static_cast<double>(count_);
 }
 
-std::size_t MovingAverage::count() const noexcept {
-    return count_;
-}
+std::size_t MovingAverage::count() const noexcept { return count_; }
 
-std::size_t MovingAverage::window_size() const noexcept {
-    return buffer_.size();
-}
+std::size_t MovingAverage::window_size() const noexcept { return buffer_.size(); }
 
-bool MovingAverage::full() const noexcept {
-    return count_ == buffer_.size();
-}
+bool MovingAverage::full() const noexcept { return count_ == buffer_.size(); }
 
 void MovingAverage::reset() noexcept {
     next_ = 0U;
     count_ = 0U;
 }
 
-}  // namespace cicd
+} // namespace cicd

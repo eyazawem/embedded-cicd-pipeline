@@ -28,4 +28,4 @@ private:
     std::size_t count_{0};
 };
 
-}  // namespace cicd
+} // namespace cicd

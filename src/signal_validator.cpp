@@ -5,7 +5,7 @@
 
 namespace cicd {
 
-SignalValidator::SignalValidator(const SignalLimits& limits) : limits_(limits) {
+SignalValidator::SignalValidator(const SignalLimits &limits) : limits_(limits) {
     if (limits_.min_value > limits_.max_value) {
         throw std::invalid_argument("min_value must not exceed max_value");
     }
@@ -31,20 +31,18 @@ void SignalValidator::reset() noexcept {
     previous_ = 0.0;
 }
 
-const SignalLimits& SignalValidator::limits() const noexcept {
-    return limits_;
-}
+const SignalLimits &SignalValidator::limits() const noexcept { return limits_; }
 
-const char* to_string(SignalStatus status) noexcept {
+const char *to_string(SignalStatus status) noexcept {
     switch (status) {
-        case SignalStatus::Valid:
-            return "VALID";
-        case SignalStatus::OutOfRange:
-            return "OUT_OF_RANGE";
-        case SignalStatus::RateExceeded:
-            return "RATE_EXCEEDED";
+    case SignalStatus::Valid:
+        return "VALID";
+    case SignalStatus::OutOfRange:
+        return "OUT_OF_RANGE";
+    case SignalStatus::RateExceeded:
+        return "RATE_EXCEEDED";
     }
     return "UNKNOWN";
 }
 
-}  // namespace cicd
+} // namespace cicd
