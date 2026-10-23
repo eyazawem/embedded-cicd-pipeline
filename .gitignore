@@ -1,0 +1,9 @@
+build/
+build-*/
+coverage/
+*.o
+*.a
+*.gcda
+*.gcno
+.vscode/
+.idea/
