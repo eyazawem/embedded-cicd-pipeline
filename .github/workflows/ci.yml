@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-and-tests:
+    name: Format, static analysis, build and test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Build reference build image
+        run: docker build -t embedded-cicd-builder:24.04 .
+
+      - name: Check formatting (clang-format)
+        run: ./scripts/format.sh --check
+
+      - name: Static analysis (Cppcheck)
+        run: ./scripts/static_analysis.sh
+
+      - name: Build and run unit tests
+        run: ./scripts/build_and_test.sh
