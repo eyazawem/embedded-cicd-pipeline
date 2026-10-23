@@ -86,3 +86,14 @@ TEST(SignalValidatorTest, ToStringCoversAllStatuses) {
     EXPECT_STREQ(cicd::to_string(SignalStatus::OutOfRange), "OUT_OF_RANGE");
     EXPECT_STREQ(cicd::to_string(SignalStatus::RateExceeded), "RATE_EXCEEDED");
 }
+
+TEST(SignalValidatorTest, LimitsReturnsConfiguredValues) {
+    SignalValidator v(kLimits);
+    EXPECT_DOUBLE_EQ(v.limits().min_value, 0.0);
+    EXPECT_DOUBLE_EQ(v.limits().max_value, 250.0);
+    EXPECT_DOUBLE_EQ(v.limits().max_delta_per_sample, 15.0);
+}
+
+TEST(SignalValidatorTest, ToStringHandlesUnknownValue) {
+    EXPECT_STREQ(cicd::to_string(static_cast<SignalStatus>(99)), "UNKNOWN");
+}
