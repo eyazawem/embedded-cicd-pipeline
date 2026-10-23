@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   quality-and-tests:
-    name: Format, static analysis, build and test
+    name: Format, static analysis, build, test and coverage
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -33,3 +33,17 @@ jobs:
 
       - name: Build and run unit tests
         run: ./scripts/build_and_test.sh
+
+      - name: Coverage (lcov, minimum 90% of lines)
+        env:
+          MIN_LINE_COVERAGE: "90"
+        run: ./scripts/coverage.sh
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: coverage/
+          if-no-files-found: warn
+          retention-days: 14
