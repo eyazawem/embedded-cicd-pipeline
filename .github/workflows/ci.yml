@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   quality-and-tests:
-    name: Format, static analysis, build, test and coverage
+    name: Format, static analysis, build, test, coverage and runtime image
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -38,6 +38,9 @@ jobs:
         env:
           MIN_LINE_COVERAGE: "90"
         run: ./scripts/coverage.sh
+
+      - name: Build runtime image and smoke test
+        run: ./scripts/build_runtime_image.sh
 
       - name: Upload coverage report
         if: always()
