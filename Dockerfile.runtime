@@ -1,0 +1,19 @@
+# Multi-stage build: compile in the reference build image, ship only the binary.
+ARG BUILDER_IMAGE=embedded-cicd-builder:24.04
+
+FROM ${BUILDER_IMAGE} AS build
+WORKDIR /src
+COPY CMakeLists.txt ./
+COPY include ./include
+COPY src ./src
+COPY tests ./tests
+RUN cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+    && cmake --build build --target signal_demo
+
+FROM ubuntu:24.04 AS runtime
+LABEL org.opencontainers.image.title="embedded-cicd-demo" \
+      org.opencontainers.image.source="https://github.com/eyazawem/embedded-cicd-pipeline"
+RUN useradd --system --no-create-home --shell /usr/sbin/nologin --uid 10001 appuser
+COPY --from=build /src/build/signal_demo /usr/local/bin/signal_demo
+USER appuser
+ENTRYPOINT ["/usr/local/bin/signal_demo"]
