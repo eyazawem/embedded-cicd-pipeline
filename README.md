@@ -56,6 +56,25 @@ from the official LTS apt repository):
   path `Jenkinsfile`. It polls the repository every 5 minutes (`H/5 * * * *`)
   because the host is not reachable from GitHub, so webhooks cannot be used.
 
+## Releases
+
+Pushing a tag that starts with `v` triggers `.github/workflows/release.yml`. It
+re-runs every gate of the pipeline, then publishes a GitHub release with:
+
+- `signal_demo-<tag>-linux-amd64.tar.gz`: the program, extracted from the
+  runtime image;
+- `coverage-report-<tag>.tar.gz`: the HTML coverage report;
+- `SHA256SUMS`: checksums of the two archives.
+
+Verify a download:
+
+```bash
+sha256sum -c SHA256SUMS --ignore-missing
+```
+
+The `v1.0.0` release was downloaded, checked against `SHA256SUMS` and executed
+in an `ubuntu:24.04` container.
+
 ## Run it locally
 
 Requirements: Docker (tested with Docker 26.1.3 on Ubuntu 20.04) and Git.
@@ -112,3 +131,4 @@ The threshold can be changed: `MIN_LINE_COVERAGE=95 ./scripts/coverage.sh`.
 - Cppcheck analyses the production code in `src/`, not the tests.
 - The runtime image is built and smoke-tested in CI but not pushed to a
   container registry.
+- The release binary is built on Ubuntu 24.04 and was verified on Ubuntu 24.04 only (run in an `ubuntu:24.04` container); other distributions are untested.
