@@ -5,7 +5,7 @@
 A C++17 signal-processing library delivered through a reproducible CI pipeline:
 formatting check, static analysis, build, unit tests, coverage gate and a
 minimal runtime container image. Every pipeline step is a script that runs
-inside the same Docker build image locally and in CI.
+inside the same Docker build image locally, on GitHub Actions and on Jenkins.
 
 ## What the software does
 
@@ -30,9 +30,31 @@ and averages the accepted samples.
 | Coverage | gcov, lcov 2.0 | `scripts/coverage.sh` | line coverage below `MIN_LINE_COVERAGE` (default 90) fails |
 | Runtime image | Docker multi-stage | `scripts/build_runtime_image.sh` | smoke test of the image fails |
 
-The GitHub Actions workflow (`.github/workflows/ci.yml`) builds the build image
-from `Dockerfile`, then runs the scripts above in order. The coverage report is
-published as the `coverage-report` artifact.
+### GitHub Actions
+
+`.github/workflows/ci.yml` builds the build image from `Dockerfile`, then runs
+the scripts above in order. The coverage report is published as the
+`coverage-report` artifact.
+
+### Jenkins
+
+The `Jenkinsfile` is a declarative pipeline that runs the same scripts in the
+same order: build reference image, check formatting, static analysis, build and
+test, coverage, runtime image. It keeps `coverage/**` as a build artifact,
+allows one build at a time, limits a build to 30 minutes and cleans the
+workspace at the end.
+
+Setup used for this project (Ubuntu 20.04 host, Jenkins installed natively
+from the official LTS apt repository):
+
+- Jenkins 2.580.1. This version refuses to start on Java 17 and requires Java
+  21 or 25; Temurin 21 was installed from the Adoptium apt repository.
+- The `jenkins` user belongs to the `docker` group so that the scripts can run
+  containers. Membership in the `docker` group is equivalent to root access on
+  the host: acceptable on a personal test machine, not on a shared server.
+- The job is a Pipeline "from SCM" on this repository, branch `main`, script
+  path `Jenkinsfile`. It polls the repository every 5 minutes (`H/5 * * * *`)
+  because the host is not reachable from GitHub, so webhooks cannot be used.
 
 ## Run it locally
 
@@ -66,7 +88,8 @@ The threshold can be changed: `MIN_LINE_COVERAGE=95 ./scripts/coverage.sh`.
 
 ```text
 .
-├── .github/workflows/ci.yml   CI pipeline
+├── .github/workflows/ci.yml   GitHub Actions pipeline
+├── Jenkinsfile                Jenkins pipeline
 ├── CMakeLists.txt
 ├── Dockerfile                 reference build image
 ├── Dockerfile.runtime         multi-stage runtime image
@@ -87,8 +110,5 @@ The threshold can be changed: `MIN_LINE_COVERAGE=95 ./scripts/coverage.sh`.
   `--ignore-errors mismatch`; the affected files are under `tests/`, which is
   excluded from the report, as is `src/main.cpp`.
 - Cppcheck analyses the production code in `src/`, not the tests.
-
-## Roadmap
-
-- Jenkins pipeline (`Jenkinsfile`) reproducing the same stages.
-- Publishing the runtime image to a container registry.
+- The runtime image is built and smoke-tested in CI but not pushed to a
+  container registry.
